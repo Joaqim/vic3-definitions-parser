@@ -1,0 +1,6 @@
+.pre-commit-config.yaml
+*.log
+direnv
+dist/
+node_modules
+!.envrc

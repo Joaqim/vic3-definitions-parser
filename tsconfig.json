@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"lib": ["ESNext"],
+		"module": "CommonJS",
+		"moduleResolution": "node",
+		"target": "ESNext",
+		"esModuleInterop": true,
+
+		"declaration": true,
+		"outDir": "./dist",
+
+		"noEmitOnError": true,
+		"noUnusedLocals": true,
+		"strictNullChecks": true
+	},
+	"exclude": ["node_modules", "dist", "__tests__"]
+}
