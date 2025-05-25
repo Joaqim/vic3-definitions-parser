@@ -86,9 +86,19 @@ test("Test Tokenizer with Comments", () => {
       y = 3
       z = 4
     }
+    // This is a comment
+
     /* This is also
      a valid comment */
-    /* */
+
+    /* /* 
+     Comments can be nested
+     # ditto
+     // And these
+    */ */
+
+    # Empty comment:
+    /**/
     the_end = true`;
   const expected_tokens: [TokenKind, string][] = [
     [TokenKind.Any, "x"],
