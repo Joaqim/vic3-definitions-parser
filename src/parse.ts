@@ -1,40 +1,43 @@
 import type {
-  Program,
-  ScopeType,
+  PrimitiveTypes,
   VariableType,
   VariableValueType,
 } from "./AST/types.types";
 import parseProgram from "./parseProgram";
+type JSValue = object | PrimitiveTypes["value"];
 
-type JSValue = object | string | number | boolean | null | undefined;
-const valueToJS = (value: VariableValueType): JSValue => {
+const variableValueToJS = (
+  value: VariableValueType | VariableType[]
+): JSValue | JSValue[] => {
+  // Array of VariableType will always be flattened to an object
+  if (Array.isArray(value)) {
+    return Object.fromEntries(
+      value.map(({ name, value }) => [name, variableValueToJS(value)])
+    );
+  }
+
   switch (value.kind) {
     case "ArrayType":
-      return value.values.map(valueToJS);
-    case "SetType":
-      return variablesToJS(value.variables);
+      return value.values.map(variableValueToJS);
     case "PrimitiveType":
       return value.value;
+    case "SetType":
+      return variableValueToJS(value.variables);
     case "VariableType":
-      return { [value.name]: valueToJS(value.value) };
+      return { [value.name]: variableValueToJS(value.value) };
     default:
-      throw new Error(`Unknown type: ${JSON.stringify(value)}`);
+      throw new Error(`Unknown value: ${JSON.stringify(value)}`);
   }
 };
-const variablesToJS = (variables: VariableType[]): Record<string, JSValue> =>
-  Object.fromEntries(
-    variables.map(({ name, value }) => [name, valueToJS(value)])
+
+export const parseToJS = (input: string) => {
+  const program = parseProgram(input);
+  return Object.fromEntries(
+    program.scopes.map(({ name, variables }) => [
+      name,
+      variableValueToJS(variables),
+    ])
   );
-
-const scopesToJS = (scopes: ScopeType[]): Record<string, JSValue> =>
-  Object.fromEntries(
-    scopes.map(({ name, variables }) => [name, variablesToJS(variables)])
-  );
-
-export const parseToJS = (input: string): Record<string, JSValue> => {
-  const program: Program = parseProgram(input);
-
-  return scopesToJS(program.scopes);
 };
 
 const parse = (input: string): string =>
